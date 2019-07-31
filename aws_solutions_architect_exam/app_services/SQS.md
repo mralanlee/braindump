@@ -1,52 +1,49 @@
-# Redshift
-- Fast and powerful
-- Fully managed
-- Petabyte-scale, data-warehouse
-- 1024KB/1MB Block Size for columnar storage
+# SQS
+- Web service that gives you access to a message queue
+- Store messages while waiting for a computer to process them
+- Distributed Queue System that allows apps to quickly and reliably queue messages that one component in  the application generates to be consumed by another.
+- Queue is temporary repistory for message awaiting processing.
+- Decouple components of an app so they can run independently.
+- Messages can contain up to 256 KB of text in any format
+- Queue acts as a buffer between component producing and saving data, and component receiving the data for processing
+- Solves issues that arise if producer is producing work faster than the consumer can process it.
 
-## Pricing
-- $0.25 per hour with no commitments or upfront costs
-- Scale to a petabyte or more for $1,000 per terabyte per year
-- Less than a tenth of most other data warehousing solutions
-- **Compute Node Hours**
-  - 1 unit per node per hour
-  - Not charged for leader node hours
-- Back Up
-- Data transfer (only within a VPC, not outside it)
 
-## Configuration
-- Starts with Single Node (160gb)
-- Scale: Multi-Node
-  - Leader Node (manages client connections and receives queries)
-  - Compute Node (store data and perform queries and computations). Up to 128 compute Nodes.
+### Pricing
+- Billed in increments of messages sizes of 64kb
 
-## Features
-### Columnar Data Storage
-- Instead of organizing by rows, Redshift organizes data by column. 
-- Column based systems are ideal for data warehousing and analytics
-  - Queries often involve aggregates performed over large data sets.
-  - Columnar data is stored sequentially on the storage media, require far fewer I/Os, greatly improving query performance
-- Stores data sequentially
+### Standard Queues
+- By default all queues are standard queue
+- Nearly unlimited number of transactions per second.
+- Guarantee that a message is delivered at least once
+- Ocassionally, more than one copy of a message might be delivered out of order
+- Best-effort ordering which ensures thage messages are generally delivered in the same order they are sent
 
-### Advanced Compression
-- Stores can be compressed much more than row-based ata stores because similar data is stored sequentially on disk.
-- Compression techniques and can often achieve significant compression relative to traditional data stores.
-- Doesn't require indexes or materialized views
-- Uses less space than traditional relational database systems.
-- Automatically samples data and selects most appropriate compression scheme
 
-### Massive Parallel Processing (MPP)
-- Automatically distributes data and query load across nodes.
-- Easy to add nodes to your data warehouse
-- Faster query performance as data warehouse grows.
+### FIFO Queues
+- Messages are first in first out basis, deliver exactly ordered processing.
+- Strictly preserved and a message is delivered once and remains available until a consumer processes and deletes it
+- Duplicates are not introduced into the queue
+- Supports message groups that allow multiple ordered message groups wihtin a single queue.
+- FIFO queues are limited to 300 transactions per second, but have all capabilities of standard queues
 
-## Security
-- Encrypted in transit using SSL
-- Encrypted at rest using AES-256 encryption
-- Takes care of key management (by default)
-  - Can manage your own keys through HSM
-  - AWS KMS
+## SQS Key facts
+- Pull based, not push based
+- Messages are 256kb in size
+- Messages can be kept in the queue from 1 minute to 15 days
+- Default retention period is 4 days
+- Guarantess that your messages will be processed at least once
 
-## Availability
-- Currently only available in 1 AZ
-- Can restore snapshots to new AZ's in the event of an outage
+## SQS Visibility Timeout
+- Amount of time that the message is invisible in the SQS queue after ar eader picks up that message.
+- Provide the job is processed before the visibility time out expires, message will be deleted from queue
+- If job is not processed within that time, message will become visible again and another will process it
+- Could result in same message being delivered twice
+- Default visibility timeout is 30 seconds
+- Increase it if your task takes > 30 seconds
+- Max is 12 hrs
+
+## Long Polling
+- Retrieve messages from your SQS Queues
+- Regular *Short Polling* returns immediately, *Long Polling* doesn't return a response until a message arrives in the message queue, or until long poll times out
+- Long polling can save money
